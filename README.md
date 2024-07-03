@@ -1,2 +1,3 @@
 # bootcamp_data
-Big Data, Inteligencia Artificial &amp; Machine Learning Full Stack Bootcamp (Keepcoding)
+This is a repository with all the practice exercises of the following botcamp:
+"Big Data, Inteligencia Artificial &amp; Machine Learning Full Stack Bootcamp" (by Keepcoding tech School)
