@@ -1,4 +1,30 @@
 CREATE OR REPLACE TABLE keepcoding.ivr_sumary AS
+
+WITH masiva_lg 
+  AS(SELECT calls_ivr_id
+        ,IF (module_name = 'AVERIA_MASIVA', 1, 0) AS masiva_lg
+      FROM `keepcoding.ivr_detail`
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY CAST(calls_ivr_id  AS NUMERIC) ORDER BY masiva_lg DESC) =1
+  ORDER BY calls_ivr_id)
+  , phone_info
+  AS (SELECT calls_ivr_id
+            , MAX(CASE WHEN step_name = 'CUSTOMERINFOBYPHONE.TX' AND step_result ='OK' THEN 1
+                  ELSE 0
+                  END) AS info_by_phone_lg
+        FROM `keepcoding.ivr_detail`)
+  , dni_info
+  AS (SELECT calls_ivr_id
+      , MAX(CASE WHEN step_name = 'CUSTOMERINFOBYDNI.TX' AND step_result ='OK' THEN 1
+            ELSE 0
+            END) AS info_by_dni_lg
+        FROM `keepcoding.ivr_detail`)
+  , dni_info
+  AS (  
+
+
+
+
+
 SELECT detail.calls_ivr_id AS ivr_id
       ,detail.calls_phone_number AS phone_number
       ,detail.calls_ivr_result AS ivr_result
@@ -19,10 +45,20 @@ SELECT detail.calls_ivr_id AS ivr_id
       ,MAX(NULLIF(NULLIF(document_identification,'UNKNOWN'), 'DESCONOCIDO')) AS document_identification
       ,MAX(NULLIF(NULLIF(customer_phone, ''), 'UNKNOWN')) AS customer_phone
       ,MAX(NULLIF(billing_account_id,'UNKNOWN')) AS billing_account_id
-      
+
 FROM `keepcoding.ivr_detail` AS detail
-JOIN 
-ON
+LEFT
+JOIN  masiva_lg
+ON detail.calls_ivr_id = masiva.calls_ivr_id
+LEFT
+JOIN phone_info
+ON detail.calls_ivr_id = phone_info.calls_ivr_id
+LEFT
+JOIN phone_info
+ON detail.calls_ivr_id = dni_info.calls_ivr_id
+LEFT 
+JOIN `keepcoding.repeated_phone_24H` As repeat_24
+ON detail.calls_ivr_id = repeat_24.calls_ivr_id
 GROUP BY calls_ivr_id
 
 
