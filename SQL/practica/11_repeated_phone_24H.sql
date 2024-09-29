@@ -1,0 +1,3 @@
+--Como en el ejercicio anterior queremos tener un registro por cada llamada y dos flags que indiquen si el 
+--calls_phone_number tiene una llamada las anteriores 24 horas o en las siguientes 24 horas. En caso afirmativo 
+--pondremos un 1 en estos flag, de lo contrario llevará un 0.
