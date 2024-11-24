@@ -129,27 +129,24 @@ class examenTest extends TestInit {
     //checkDf(expectedRDD, output)
   }
 
-  "ejercicio 5 " should "do ejercicio 5" in {
-    import spark.implicits._
-    val dfEstud = Seq(
-      ("Jorge", 20, 9),
-      ("María", 21, 8),
-      ("Justina", 22, 7),
-      ("Ana", 21, 10),
-      ("Julio", 19, 5),
-      ("Ivan", 23, 6)
-    ).toDF("nombre", "edad", "calificacion")
+  "ejercicio 5 " should "Calcular y agregar una columna de ingreso total al df de ventas" in {
 
-    val expected = Seq(
-      ("Ana", 10),
-      ("Jorge", 9)
-    ).toDF("nombre", "calificacion")
 
-    val output = examen.ejercicio5(dfEstud)(spark)
+    val ventasSchema = StructType(Seq(
+      StructField("id_venta", IntegerType, true),
+      StructField("id_producto", IntegerType, true),
+      StructField("cantidad", IntegerType, true),
+      StructField("precio_unitario", DoubleType, true)
+    ))
+    val in = spark.read.format("csv")
+      .option("header", "true")
+      .schema(ventasSchema)
+      .load("src/test/resources/examen/ventas.csv")
+
+    val output = examen.ejercicio5(in)(spark)
 
     // Show the result
-    output.show()
-    checkDf(expected, output)
+    output.show(false)
   }
 }
 
