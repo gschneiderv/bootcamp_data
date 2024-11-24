@@ -60,16 +60,13 @@ object examen {
   */
 
   def ejercicio4(palabras: List[String])(spark:SparkSession): RDD[(String, Int)] = {
-    val rdd = Seq(
-      ("Jorge", 20, 9),
-      ("María", 21, 8.5),
-      ("Justina", 22, 7.7),
-      ("Ana", 21, 9.5),
-      ("Julio",19 , 5.0),
-      ("Ivan", 23, 6.7)
-    )
-    spark.sparkContext.parallelize(rdd).map(x => (x._1, x._2))
+
+    val rdd = spark.sparkContext.parallelize(palabras)
+    val wordCountRDD = rdd.map(word => (word, 1)).reduceByKey(_ + _)
+
+    wordCountRDD
   }
+
   /**
   Ejercicio 5: Procesamiento de archivos
   Pregunta: Carga un archivo CSV que contenga información sobre
@@ -77,7 +74,8 @@ object examen {
             y calcula el ingreso total (cantidad * precio_unitario) por producto.
   */
   def ejercicio5(ventas: DataFrame)(spark:SparkSession): DataFrame = {
-    ventas
+    val res = ventas.withColumn("ingreso_total", col("cantidad")*col("precio_unitario"))
+    res
   }
 
 }
