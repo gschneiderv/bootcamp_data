@@ -1,7 +1,7 @@
 package examen
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{IntegerType, StringType, DoubleType, StructField, StructType}
+import org.apache.spark.sql.types.{DoubleType, IntegerType, StringType, StructField, StructType}
 import org.scalatest.Matchers.convertToAnyShouldWrapper
 import utils.TestInit
 
@@ -29,7 +29,17 @@ class examenTest extends TestInit {
 
     val res = examen.ejercicio1(dfEstud)(spark)
     checkDf(expected, res)
-    //res.show()
+    /* Para usar el checkDf utilicé:
+
+    libraryDependencies ++= Seq(
+
+  "org.apache.spark" %% "spark-core" % "3.2.4",
+  "org.apache.spark" %% "spark-sql" % "3.2.4",
+  "org.apache.spark" %% "spark-sql" % "3.2.4" % Test classifier "tests",
+  "org.scalatest" %% "scalatest" % "3.0.8" % Test
+   **/
+
+    res.show()
   }
 
   "ejercicio 2 " should "Definir la paridad del numero de nota de data frame de alumnos " in {
@@ -53,7 +63,6 @@ class examenTest extends TestInit {
     ).toDF("nombre", "edad", "calificacion", "paridad")
 
 
-    val paridad = dfEstud.col("calificacion")
     val res = examen.ejercicio2(dfEstud, "calificacion")(spark)
 
     res.show()
@@ -108,26 +117,31 @@ class examenTest extends TestInit {
     checkDf(expectedWithSchema, output)
   }
 
-  "ejercicio 4 " should "do ejercicio 4" in {
+  "ejercicio 4 " should "Contar la cantidad de ocurrencias de cada palabra en una lista." in {
+
     import spark.implicits._
-    val listaPalabras = List("hola")
+    val listaPalabras = List("Juan", "Maria", "Juan", "Alicia", "Charlie", "Maria")
 
     val expectedData = Seq(
-      ("Alice", 25),
-      ("Bob", 30),
-      ("Charlie", 35),
-      ("Diana", 28)
+      ("Juan", 2),
+      ("Maria", 2),
+      ("Charlie", 1),
+      ("Alicia", 1)
     )
 
-    // Step 3: Create an RDD from the Sequence
     val expectedRDD = sc.parallelize(expectedData)
+    val expectedDF = expectedRDD.toDF("word", "count")
 
     val output = examen.ejercicio4(listaPalabras)(spark)
 
-    // Show the result
-    println(output)
-    //checkDf(expectedRDD, output)
+
+    val outputDF = output.toDF("word", "count")
+
+    checkDf(expectedDF.orderBy("word"), outputDF.orderBy("word"))
+    outputDF.show()
   }
+
+
 
   "ejercicio 5 " should "Calcular y agregar una columna de ingreso total al df de ventas" in {
 
@@ -145,7 +159,6 @@ class examenTest extends TestInit {
 
     val output = examen.ejercicio5(in)(spark)
 
-    // Show the result
     output.show(false)
   }
 }
