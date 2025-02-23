@@ -6,10 +6,10 @@ import mlflow
 import mlflow.sklearn
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.datasets import load_breast_cancer
+
 from sklearn.metrics import accuracy_score,f1_score, precision_score, recall_score
 from sklearn.datasets import load_wine
 
@@ -56,6 +56,7 @@ def mlflow_tracking(name_job, X_train, X_test, y_train, y_test, c_values):
             pipeline.fit(X_train, y_train)
             accuracy_train = pipeline.score(X_train, y_train)
             pipeline.score(X_test, y_test)
+            y_pred = pipeline.predict(X_test)
 
             mlflow.log_metric('accuracy_train', accuracy_train)
             mlflow.log_param("C", c)
